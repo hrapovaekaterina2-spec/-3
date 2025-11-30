@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Products</title>
+  <style>
+    /* === Общие стили сайта === */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    /* === Стили карточек товаров === */
+    .products {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 280px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .product-card h3 {
+      margin: 12px 0 6px;
+    }
+
+    .product-card p {
+      color: #555;
+      font-size: 14px;
+    }
+
+    .price {
+      font-weight: bold;
+      color: #2a9d8f;
+      margin: 10px 0;
+    }
+
+    .btn-buy {
+      background-color: #2a9d8f;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* === Стили модального окна === */
+    .modal {
+      display: none; /* По умолчанию скрыто */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 20px;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #aaa;
+    }
+
+    .close:hover {
+      color: black;
+    }
+
+    /* === Карусель в модальном окне === */
+    .carousel {
+      position: relative;
+      margin: 15px 0;
+    }
+
+    .carousel img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .carousel-btn {
+      background: rgba(255,255,255,0.7);
+      border: none;
+      font-size: 18px;
+      padding: 8px 12px;
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .prev { left: 10px; }
+    .next { right: 10px; }
+
+    .modal h3, .modal p, .modal .price {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>My Products</h1>
+
+  <!-- === Контейнер для карточек товаров === -->
+  <div class="products">
+
+    <!-- === Карточка 1: Курс для самых маленькиx === -->
+    <div class="product-card" data-product="reading">
+      <img src="https://placehold.co/280x160?text=Reading+Lesson" alt="Курс для самых маленьких" />
+      <h3>Курс для самых маленьких</h3>
+      <p>Знакомимся с английским через игры и песни.</p>
+      <div class="price">5000 р / 8 занятий</div>
+      <button class="btn-buy" onclick="openModal('reading')">Buy</button>
+    </div>
+
+    <!-- === Карточка 2: Пример — замени на свой === -->
+    <div class="product-card" data-product="writing">
+      <img src="https://placehold.co/280x160?text=Writing+Course" alt="Курс подготовки к школе" />
+      <h3>Курс подготовки к школе</h3>
+      <p>Учимся читать</p>
+      <div class="price">5600 р / 8 занятий</div>
+      <button class="btn-buy" onclick="openModal('writing')">Buy</button>
+    </div>
+
+    <!-- === Карточка 3: Пример — замени на свой === -->
+    <div class="product-card" data-product="grammar">
+      <img src="https://placehold.co/280x160?text=Grammar+Bootcamp" alt="Grammar Bootcamp" />
+  
+      <h3>Для школьников 8-12 лет</h3>
+      <p>Учим грамматику, сочиняем простые истории, много говорим</p>
+      <div class="price">5600 р / 8 занятий</div>
+      <button class="btn-buy" onclick="openModal('grammar')">Buy</button>
+    </div>
+
+  </div>
+
+  <!-- === Модальное окно (изначально скрыто) === -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+
+      <!-- Здесь динамически подставляется контент -->
+      <div id="modalProductDetails"></div>
+    </div>
+  </div>
+
+  <script>
+    /* === Данные товаров для модального окна === */
+    const products = {
+      reading: {
+        title: "Reading Lessons",
+        price: "$30 / session",
+        description: "Improve your reading fluency and comprehension with personalized lessons. Available as individual or group sessions.",
+        images: [
+          "https://placehold.co/600x250?text=Reading+1",
+          "images/young-woman-doing-speech-therapy-with-children_23-2149110285.jpg",
+          "https://placehold.co/600x250?text=Reading+3"
+        ]
+      },
+      writing: {
+        title: "Writing Course",
+        price: "$45 / course",
+        description: "A structured course covering essay writing, storytelling, and editing techniques.",
+        images: [
+          "https://placehold.co/600x250?text=Writing+1",
+          "https://placehold.co/600x250?text=Writing+2"
+        ]
+      },
+      grammar: {
+        title: "Grammar Bootcamp",
+        price: "$60 / bootcamp",
+        description: "Intensive grammar training with exercises, quizzes, and live feedback.",
+        images: [
+          "https://placehold.co/600x250?text=Grammar+1",
+          "https://placehold.co/600x250?text=Grammar+2",
+          "https://placehold.co/600x250?text=Grammar+3",
+          "https://placehold.co/600x250?text=Grammar+4"
+        ]
+      }
+    };
+
+    let currentSlide = 0;
+    let currentProduct = null;
+
+    /* === Открытие модального окна === */
+    function openModal(productId) {
+      const product = products[productId];
+      if (!product) return;
+
+      currentProduct = productId;
+      currentSlide = 0;
+      renderModalContent(product);
+      document.getElementById('productModal').style.display = 'block';
+    }
+
+    /* === Закрытие модального окна === */
+    function closeModal() {
+      document.getElementById('productModal').style.display = 'none';
+    }
+
+    /* === Отображение контента в модальном окне === */
+    function renderModalContent(product) {
+      const imgList = product.images;
+      const imgHTML = `
+        <div class="carousel">
+          <img src="${imgList[currentSlide]}" alt="${product.title}">
+          ${imgList.length > 1 ? `<button class="carousel-btn prev" onclick="changeSlide(-1)">‹</button>` : ''}
+          ${imgList.length > 1 ? `<button class="carousel-btn next" onclick="changeSlide(1)">›</button>` : ''}
+        </div>
+      `;
+
+      document.getElementById('modalProductDetails').innerHTML = `
+        <h3>${product.title}</h3>
+        <div class="price">${product.price}</div>
+        <p>${product.description}</p>
+        <button class="btn-buy" style="margin-top: 10px;">Buy Now</button>
+        ${imgHTML}
+      `;
+    }
+
+    /* === Переключение слайдов в карусели === */
+    function changeSlide(direction) {
+      const imgList = products[currentProduct].images;
+      currentSlide = (currentSlide + direction + imgList.length) % imgList.length;
+      renderModalContent(products[currentProduct]);
+    }
+
+    /* === Закрытие по клику вне окна === */
+    window.onclick = function(event) {
+      const modal = document.getElementById('productModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
+  </script>
+
+</body>
+</html>
